@@ -2,11 +2,14 @@ ARG SHARELATEX_BASE_TAG=sharelatex/sharelatex:latest
 FROM $SHARELATEX_BASE_TAG
 
 # Install xeLatex and CJK 
-RUN  apt-get install -y texlive-lang-cjk texlive-xetex texlive-luatex
+RUN  apt-get update \
+     && apt-get install -y texlive-lang-cjk texlive-xetex texlive-luatex \
+     && rm -rf /var/lib/apt/lists/*
 # Add supports for new fonts cache generation
 COPY ./hotfix/97_generate_font_cache.sh /etc/my_init.d/97_generate_font_cache.sh
 
 # Install axios library for OAuth2
+WORKDIR /overleaf
 RUN npm install axios --save
 COPY ./hotfix/AuthenticationController.js /overleaf/services/web/app/src/Features/Authentication/AuthenticationController.js
 COPY ./hotfix/AuthenticationManager.js /overleaf/services/web/app/src/Features/Authentication/AuthenticationManager.js
